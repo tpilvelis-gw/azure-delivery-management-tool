@@ -1,8 +1,12 @@
+import logo from '../glasswall-logo-white.png'
 
 function GWLogo() {
+
+
     return (
         <>
-            <h1>Logo</h1>
+            <img src={logo} alt="Logo" style={{display:'block', margin:"0 auto", width:"20%"}}/>
+            <h1 style={{textAlign:'center', color:"white"}}>Glasswall Rebuild Lite</h1>
         </>
     );
 }

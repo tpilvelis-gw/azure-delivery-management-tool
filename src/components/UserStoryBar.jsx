@@ -16,19 +16,21 @@ function UserStoryBar(props) {
 
         const value = element.estimate / maxSize * 100;
         const percentage = value.toString() + "%"
-
+        
         elements.push( <Task 
             estimationSize={percentage}
-            progress={element.progress}
+            progress={element.is_done}
             name={element.name} /> );
     });
 
     return (
         <>
-            <h3>{props.name}</h3>
+            <hr/>
+            <h3 style={{color:"white", marginBottom:"30px"}}>{props.name}</h3>
             <div name="tasks">
                 { elements }
             </div>
+            
             
         </>
     );

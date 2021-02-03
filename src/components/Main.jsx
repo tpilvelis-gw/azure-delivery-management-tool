@@ -2,88 +2,49 @@ import GWLogo from "./GWLogo";
 import UserStoryBar from "./UserStoryBar";
 import * as azdev from "azure-devops-node-api";
 import React, { useState, useEffect } from "react";
+import $ from "jquery";
 
-function connectAzureDevops() {
-    let orgUrl = "https://dev.azure.com/yourorgname";
-    let token = "AZURE_PERSONAL_ACCESS_TOKEN";
-    let authHandler = azdev.getPersonalAccessTokenHandler(token); 
-    let connection = new azdev.WebApi(orgUrl, authHandler);
-    return connection;
-}
-
-function getChildrenWorkItems(workItem){
-    let childWorkItems = []
-    workItem.relations.forEach(element => {
-        if (element.attributes.name === "Child"){
-            let split_url = element.url.split("/");
-            let childWorkItemNumber = Number(split_url[split_url.length - 1]);
-            childWorkItems.push(childWorkItemNumber);
-        }
-    });
-    return childWorkItems;
-}
-
-function getTask(workItemNumber, connection){
-    let name = null;
-    let estimate = null;
-
-    connection.getWorkItemTrackingApi().then((workItemTrackingApi) => {
-        workItemTrackingApi.getWorkItem(workItemNumber).then( (workItem) => {
-            name = workItem.fields["System.Title"];
-            estimate = workItem.fields["Microsoft.VSTS.Scheduling.StoryPoints"];
-        });
-    });
-    return { name: name, estimate: estimate }
+let style = {
+    //display: "flex",
+    //justifyContent: "center",
+    //alignItems: "center",
+    height: "200vh",
+    background: "linear-gradient(-45deg, #196480, #0c3450)"
 }
 
 function Main() {
 
-    let initTasks = [
-        {
-            name: "Rendering...",
-            estimate: 1,
-            progress: 100
-        }
-    ]
+    let userStoryIDs = ["114352", "114369", "113284"]
+    let userStories = []
+    let elements = []
 
-    let workItemNumber = 114352;
+    for (let i = 0; i < userStoryIDs.length; i++){
 
-    const [userStoryName, setUserStoryName] = React.useState("")
-    const [relationships, setRelationships] = React.useState(null);
-    const [tasks, setTasks]                 = React.useState(initTasks);
+        var settings = {
+            "url": "http://localhost:8000/user_story/" + userStoryIDs[i],
+            "method": "GET",
+            "timeout": 0,
+            "async": false
+        };
 
-    let connection = connectAzureDevops();
+        $.ajax(settings).done(function (response) {
+            userStories.push(response);
+            console.log(response);
 
-    //Get User Story Name And Relationships
-    connection.getWorkItemTrackingApi().then((workItemTrackingApi) => {
-        workItemTrackingApi.getWorkItem(workItemNumber, undefined, undefined, "Relations").then( (workItem) => {
-            console.log(workItem);
-            setUserStoryName(workItem.fields["System.Title"]);
-            let childWorkItems = getChildrenWorkItems(workItem)
-            setRelationships(childWorkItems);
-        });
-    });
-
-    //Get Tasks
-    let list = [];
-    if (relationships != null){
-        relationships.forEach(element => {
-            let task = getTask(element, connection);
-            console.log(task);
-            list.push(task);
+            elements.push(<UserStoryBar 
+                name={userStories[i].user_story_name} 
+                tasks={userStories[i].tasks} />
+                );
         });
     }
-    setTasks(list);
 
     return (
         <>
-            <GWLogo />
-            <UserStoryBar
-                name={ userStoryName }
-                tasks={ tasks } />
-            
+        <div style={style}>
+            <GWLogo /> 
+            {elements}
+        </div>
         </>
     );
 }
-
 export default Main;

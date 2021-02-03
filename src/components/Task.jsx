@@ -14,8 +14,13 @@ function Task(props) {
     return (
         <>
         <div style={ taskStyle }>
-            <p>{ props.name != null ? props.name : "Untitled" }</p>
-            <ProgressBar now={props.progress} />
+            <p style={{fontSize:"50%", color:"white"}} >{ props.name != null ? props.name : "Untitled" }</p>
+            <ProgressBar 
+                now={props.progress} 
+                label={ 
+                    props.progress == 50 ? "Active" 
+                    : props.progress == 100 ? "Done" : "None"
+                } />
         </div>
         </>
     );
